@@ -5,6 +5,9 @@
 //        npm test -- limiter (only tests whose name contains "limiter")
 import { chromium } from 'playwright';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+import http from 'node:http';
 import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -403,6 +406,61 @@ test('effects: every transformer effect renders finite audio', async (page) => {
     return out;
   });
   for (const [fx, v] of Object.entries(r)) ok(v.finite && v.peak > 0.01 && v.peak <= 1 && v.secs > 1, `${fx}: ${JSON.stringify(v)}`);
+});
+
+// ---------------------------------------------------------------- accessibility / hosting
+test('accessibility: no serious or critical axe-core violations in the main views', async (page) => {
+  const axeSource = await readFile(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
+  await page.addScriptTag({ content: axeSource });
+  const found = [];
+  for (const theme of ['dark', 'light']) {
+    for (const view of ['home', 'master', 'advanced', 'extract', 'midi', 'transformer', 'help']) {
+      const r = await page.evaluate(async ([theme, view]) => {
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.motion = 'off';
+        closeHelp();
+        if (view === 'home') showHome();
+        else if (view === 'master') { openModule('master'); if (!state.file) { await importFile(T.file(T.mix(3))); await renderCurrent(); } }
+        else if (view === 'advanced') { openModule('master'); setMode(true); }
+        else if (view === 'help') { openModule('master'); showHelp('master'); }
+        else openModule(view);
+        await new Promise(res => setTimeout(res, 400));
+        const out = await axe.run(document, { resultTypes: ['violations'] });
+        return out.violations.filter(v => v.impact === 'serious' || v.impact === 'critical').map(v => `${v.id} (${v.nodes.map(n => n.target.join(' ')).slice(0, 3).join(', ')})`);
+      }, [theme, view]);
+      r.forEach(v => found.push(`${theme}/${view}: ${v}`));
+    }
+  }
+  ok(found.length === 0, found.join('\n      '));
+});
+
+test('hosting: served over HTTP the app registers its service worker and reloads offline', async (page) => {
+  const types = { '.html': 'text/html', '.js': 'text/javascript', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
+  const server = http.createServer(async (req, res) => {
+    let p = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    if (p.endsWith('/')) p += 'index.html';
+    const file = path.join(root, path.normalize(p));
+    if (!file.startsWith(root)) { res.writeHead(403); res.end(); return; }
+    try { const body = await readFile(file); res.writeHead(200, { 'content-type': types[path.extname(file)] || 'application/octet-stream' }); res.end(body); }
+    catch { res.writeHead(404); res.end(); }
+  });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  const url = `http://127.0.0.1:${server.address().port}/CDQP.Offline.Audio.Master.html`;
+  try {
+    await page.goto(url);
+    const sw = await page.evaluate(async () => { const reg = await navigator.serviceWorker.ready; return !!reg.active; });
+    ok(sw, 'service worker not active');
+    await page.waitForFunction(() => !!document.querySelector('link[rel=manifest]'));
+    const manifest = await page.evaluate(async () => (await fetch(document.querySelector('link[rel=manifest]').href)).json());
+    ok(manifest.start_url && manifest.icons.length >= 3, 'manifest incomplete');
+    await page.context().setOffline(true);
+    await page.reload();
+    const offline = await page.evaluate(() => ({ title: document.title, ready: typeof state === 'object' && document.getElementById('home').offsetHeight > 0 }));
+    ok(offline.ready && offline.title.includes('Audio Master'), `offline reload failed: ${JSON.stringify(offline)}`);
+  } finally {
+    await page.context().setOffline(false);
+    server.close();
+  }
 });
 
 // ---------------------------------------------------------------- runner

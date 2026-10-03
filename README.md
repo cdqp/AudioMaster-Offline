@@ -45,6 +45,12 @@ and a Web Worker; the page makes no network request. Settings (language, theme, 
 To publish it online, enable **GitHub Pages** on the repository (branch `main`, folder `/`): `index.html` forwards
 visitors to the app.
 
+### Install it as an app
+
+When the app is opened from a web address (GitHub Pages or any HTTPS server), it can be installed like a native
+application (an *Install app* button appears in the header, or use the browser's install menu). After the first
+visit it keeps working offline; new versions are picked up automatically on the next visit.
+
 ### Keyboard shortcuts
 
 | Keys | Action |
@@ -91,7 +97,8 @@ tracks the dominant pitch with autocorrelation and quantises it to the chosen sc
 ## Development
 
 The whole app lives in `CDQP.Offline.Audio.Master.html` (styles, markup, translations, presets, DSP and the Web
-Worker source), so it can be shared as one file. The repository adds a headless test-suite.
+Worker source), so it can be shared as one file. The repository adds the installable-app files (`manifest.webmanifest`,
+`sw.js`, `icons/`), the documentation and a headless test-suite.
 
 ```bash
 npm install
@@ -103,8 +110,9 @@ npm test -- limiter               # only the tests whose name contains "limiter"
 
 The tests check the loudness meter against the EBU Tech 3341 / 3342 reference signals, true-peak detection, the
 limiter (ceiling and smooth gain), alignment and flatness of the tone graph, filter slopes, loudness targeting,
-stem reconstruction, denoising, WAV and MIDI encoders, multichannel down-mix, and the main UI flows (disabled
-states, help dialogs, cancellation, every effect). They run on every push through GitHub Actions.
+stem reconstruction, denoising, WAV and MIDI encoders, multichannel down-mix, the main UI flows (disabled
+states, help dialogs, cancellation, every effect), accessibility (axe-core) and the offline hosted version. They
+run on every push through GitHub Actions.
 
 ## Limitations
 
@@ -112,7 +120,7 @@ states, help dialogs, cancellation, every effect). They run on every push throug
 - Stem separation and *Music to MIDI* are DSP heuristics, not machine-learning models.
 - Available input formats depend on the browser's own decoders.
 
-See [CHANGELOG.md](CHANGELOG.md) for the history of changes.
+See [CHANGELOG.md](CHANGELOG.md) for the history of changes and [CONTRIBUTING.md](CONTRIBUTING.md) to get involved.
 
 ## Credits
 

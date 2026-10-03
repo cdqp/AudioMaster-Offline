@@ -1,0 +1,17 @@
+{
+  "name": "CDQP Offline Audio Master",
+  "short_name": "Audio Master",
+  "description": "Free, 100% local audio studio: mastering, music and vocal repair, stem separation, MIDI and effects.",
+  "start_url": "./CDQP.Offline.Audio.Master.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0d10",
+  "theme_color": "#0b0d10",
+  "categories": ["music", "productivity", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

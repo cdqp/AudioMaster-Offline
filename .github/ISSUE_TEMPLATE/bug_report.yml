@@ -1,0 +1,48 @@
+name: Bug report
+description: Something sounds wrong, crashes or does not behave as expected.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Please do **not** attach private recordings you do not want
+        to share publicly — a short description of the material (genre, length, format) is usually enough.
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Mastering
+        - Music repair
+        - Vocal repair
+        - Stems (vocal / instrumental)
+        - MIDI
+        - FX (transformer)
+        - Interface / other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Steps to reproduce, the task or preset used, and what you expected instead.
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: Audio file
+      description: Format, sample rate, channels and duration (e.g. "MP3, 44.1 kHz stereo, 3:40").
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and system
+      description: e.g. "Chrome 140 on Windows 11", "Safari 19 on iPhone".
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Console messages
+      description: Optional. Errors shown in the browser's developer console (F12 → Console).
+      render: text

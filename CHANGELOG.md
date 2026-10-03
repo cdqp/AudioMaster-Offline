@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.2.0 — 2026-10-03
+
+### Added
+- **Installable offline app** when the folder is hosted (GitHub Pages or any HTTPS server): web manifest, icons
+  and a service worker that keeps the app available without a connection after the first visit and picks up new
+  releases on the next one. An *Install app* button appears when the browser offers installation. Opening the
+  HTML file from disk is unchanged.
+- Accessibility test (axe-core, both themes, main views) and an offline/hosting test in the suite.
+- `CONTRIBUTING.md`, issue templates, Dependabot configuration and `.editorconfig`.
+
+### Fixed
+- The footer (FAQ / help, credits) was hidden on the home page: the workspace section was never closed, so the
+  footer lived inside it.
+- Every slider and drop-down now has an accessible name taken from its visible label, and sliders announce their
+  formatted value (e.g. "230 ms"); seek bars are labelled.
+- Small blue labels in the light theme reached only 3.6:1 contrast (now above 4.5:1).
+- Page structure: one `main` landmark, a level-one heading on every view, a skip link for keyboard users.
+
 ## 1.1.0 — 2026-10-03
 
 ### Fixed — audio

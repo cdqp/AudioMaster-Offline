@@ -1,6 +1,6 @@
 {
   "name": "audiomaster-offline",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "CDQP Offline Audio Master — a 100% local, single-file browser audio studio (mastering, repair, stems, MIDI, FX).",
   "type": "module",
@@ -9,6 +9,7 @@
     "lint": "node tests/lint.mjs"
   },
   "devDependencies": {
+    "axe-core": "^4.11.0",
     "playwright": "1.56.1"
   },
   "engines": {
